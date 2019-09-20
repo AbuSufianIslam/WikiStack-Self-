@@ -22,6 +22,12 @@ const Page = db.define('page', {
 	}
 });
 
+Page.beforeValidate((page) => {
+	if (!page.slug) {
+		page.slug = page.title.replace(/\s/g, '_').replace(/\W/g, '').toLowerCase();
+	}
+});
+
 const User = db.define('user', {
 	name: {
 		type: Sequelize.STRING,
@@ -29,9 +35,14 @@ const User = db.define('user', {
 	},
 	email: {
 		type: Sequelize.STRING,
-		allowNull: false
+		allowNull: false,
+		validate: {
+			isEmail: true
+		}
 	}
 });
+
+Page.belongsTo(User, { as: 'author' });
 
 module.exports = {
 	db,
